@@ -202,6 +202,16 @@ function toRelativeSameOrigin(url: string): string {
     try {
       const parsed = new URL(url)
       if (parsed.origin !== window.location.origin) return url
+      // Absolute same-origin links outside the configured dashboard basePath
+      // target the public site. Preserve their origin so splitInternalUrl can
+      // route them through native navigation instead of prefixing /dashboard.
+      if (
+        NEXT_PUBLIC_BASE_PATH &&
+        parsed.pathname !== NEXT_PUBLIC_BASE_PATH &&
+        !parsed.pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`)
+      ) {
+        return url
+      }
       pathname = parsed.pathname
       search = parsed.search
       hash = parsed.hash
