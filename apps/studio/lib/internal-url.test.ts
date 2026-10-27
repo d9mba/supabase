@@ -111,6 +111,31 @@ describe('splitInternalUrl with a configured basePath', () => {
     expect(split('/dashboard-other/x').to).toBe('/dashboard-other/x')
   })
 
+  it('keeps public docs and changelog paths outside the dashboard base path', async () => {
+    vi.stubEnv('NEXT_PUBLIC_BASE_PATH', '/dashboard')
+    vi.resetModules()
+    const { splitInternalUrl: split } = await import('./internal-url')
+
+    const docsUrl = new URL('/docs/guides/platform/manage-your-usage/logs-query', window.location.origin)
+    expect(split(docsUrl.toString())).toEqual({
+      to: docsUrl.toString(),
+      external: true,
+    })
+
+    expect(split('/changelog')).toEqual({
+      to: new URL('/changelog', window.location.origin).toString(),
+      external: true,
+    })
+
+    expect(split('/docs/guides/platform/manage-your-usage/logs-query?tab=sql#example')).toEqual({
+      to: new URL(
+        '/docs/guides/platform/manage-your-usage/logs-query?tab=sql#example',
+        window.location.origin
+      ).toString(),
+      external: true,
+    })
+  })
+
   it('passes already basepath-relative inputs through unchanged', async () => {
     // The router shim strips origin + basePath *before* splitting, so the
     // input here is already relative. Double-stripping must be a no-op for
