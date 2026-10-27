@@ -19,9 +19,10 @@
 //      (this is what `buildTableEditorUrl` does)
 //   3. a genuinely external URL like `https://supabase.com/docs`.
 //
-// Split into three parts: pathname, search, hash. Same-origin absolute
-// URLs are normalised to a relative path. Cross-origin URLs are left
-// alone so TanStack's external-link path handles them.
+// Split into three parts: pathname, search, hash. Same-origin dashboard URLs
+// are normalised to basepath-relative paths. Cross-origin URLs and known
+// public-site routes (docs and changelog) are left as complete URLs so
+// TanStack's external-link path handles them without adding /dashboard.
 //
 // basePath quirk: TanStack's `to` is **basepath-relative** — given
 // `basepath: '/dashboard'` and `to: '/foo'`, TanStack builds the href
