@@ -293,7 +293,14 @@ export function useRouter() {
       // The `<AnyRouter, string>` type arguments opt out of the registered
       // route tree's strict typing: Next-style hrefs are free-form strings
       // that can't satisfy the route-path union at compile time.
-      const { to, search, hash } = splitInternalUrl(target)
+      const { to, search, hash, external } = splitInternalUrl(target)
+      if (external) {
+        if (typeof window !== 'undefined') {
+          if (options?._replace) window.location.replace(to)
+          else window.location.assign(to)
+        }
+        return true
+      }
       await router.navigate<AnyRouter, string>({
         to,
         search: search ?? {},
@@ -378,7 +385,8 @@ export function useRouter() {
           // preloads the real target instead of a path-mangled one.
           // `<string, string>` (TFrom, TTo) loosens `to` to a plain string
           // for the same free-form-href reason as `navigate` above.
-          const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
+          const { to, search, hash, external } = splitInternalUrl(toRelativeSameOrigin(url))
+          if (external) return
           await router.preloadRoute<string, string>({
             to,
             search: search ?? {},
