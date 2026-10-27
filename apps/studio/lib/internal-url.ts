@@ -78,6 +78,24 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
     return { to: url }
   }
 
+  // The dashboard is mounted below /dashboard on the same origin as the
+  // public Supabase site. Public pages such as /docs and /changelog are not
+  // Studio routes: returning them as a TanStack `to` path makes the router
+  // prepend its basePath and incorrectly sends users to /dashboard/docs or
+  // /dashboard/changelog. Leave these same-origin paths as absolute URLs so
+  // TanStack uses native browser navigation rather than appending basePath.
+  // This intentionally applies to the site's top-level public routes while
+  // keeping dashboard routes (for example /org/... and /project/...) internal.
+  if (
+    NEXT_PUBLIC_BASE_PATH &&
+    (parsed.pathname === '/docs' ||
+      parsed.pathname.startsWith('/docs/') ||
+      parsed.pathname === '/changelog' ||
+      parsed.pathname.startsWith('/changelog/'))
+  ) {
+    return { to: parsed.toString() }
+  }
+
   let pathname = parsed.pathname
   // Strip a leading basePath segment so we hand TanStack a basepath-
   // relative path. Match `/dashboard` exactly OR `/dashboard/...`; don't
