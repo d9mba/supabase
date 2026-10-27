@@ -107,6 +107,13 @@ describe('splitInternalUrl with a configured basePath', () => {
       hash: 'top',
     })
     expect(split('/dashboard')).toEqual({ to: '/', search: undefined, hash: undefined })
+    expect(
+      split(new URL('/dashboard/project/abc?schema=public', window.location.origin).toString())
+    ).toEqual({
+      to: '/project/abc',
+      search: { schema: 'public' },
+      hash: undefined,
+    })
     // A coincidental prefix is not stripped.
     expect(split('/dashboard-other/x').to).toBe('/dashboard-other/x')
   })
@@ -116,9 +123,18 @@ describe('splitInternalUrl with a configured basePath', () => {
     vi.resetModules()
     const { splitInternalUrl: split } = await import('./internal-url')
 
-    const docsUrl = new URL('/docs/guides/platform/manage-your-usage/logs-query', window.location.origin)
+    const docsUrl = new URL(
+      '/docs/guides/platform/manage-your-usage/logs-query',
+      window.location.origin
+    )
     expect(split(docsUrl.toString())).toEqual({
       to: docsUrl.toString(),
+      external: true,
+    })
+
+    const publicSiteUrl = new URL('/pricing', window.location.origin)
+    expect(split(publicSiteUrl.toString())).toEqual({
+      to: publicSiteUrl.toString(),
       external: true,
     })
 
