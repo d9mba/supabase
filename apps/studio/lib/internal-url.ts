@@ -90,7 +90,7 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
     (parsed.pathname === NEXT_PUBLIC_BASE_PATH ||
       parsed.pathname.startsWith(`${NEXT_PUBLIC_BASE_PATH}/`))
   )
-  const isAbsoluteUrl = /^https?:\\/\\//i.test(url)
+  const isAbsoluteUrl = url.startsWith('http://') || url.startsWith('https://')
   const isKnownPublicPath =
     parsed.pathname === '/docs' ||
     parsed.pathname.startsWith('/docs/') ||
