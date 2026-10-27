@@ -286,8 +286,9 @@ export function useRouter() {
       // decodes it and strips control characters (dropping `%0A` newlines
       // from values like the Logs Explorer's `s` SQL param). Split into
       // { to, search, hash } instead; the target is already relative and
-      // basepath-stripped, so splitInternalUrl's own origin/basePath
-      // normalisation is a no-op here. `search: {}` clears the query,
+      // basepath-stripped. The helper also identifies docs/changelog links as
+      // public-site destinations so they can bypass dashboard routing.
+      // `search: {}` clears the query,
       // matching Next's push-without-query semantics; same for `hash: ''`.
       //
       // The `<AnyRouter, string>` type arguments opt out of the registered
